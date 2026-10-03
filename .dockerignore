@@ -1,0 +1,9 @@
+node_modules
+.git
+.gitignore
+napcat
+tools
+*.log
+mock-napcat-test.js
+.claude
+.vscode
