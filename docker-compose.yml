@@ -1,0 +1,36 @@
+# 爱丽丝 QQ 机器人 —— 云端一键部署
+# 用法：
+#   1. cp .env.example .env && 编辑 .env 填入 LLM_API_KEY
+#   2. docker compose up -d
+#   3. 浏览器打开 http://<服务器公网IP>:6099/webui 扫码登录 QQ
+#   4. docker logs -f alice-bot 看是否 "爱丽丝上线"
+
+services:
+  napcat:
+    image: mlikiowa/napcat-docker:latest
+    container_name: napcat
+    restart: unless-stopped
+    environment:
+      - NAPCAT_UID=0
+      - NAPCAT_GID=0
+    ports:
+      - "6099:6099"   # NapCat WebUI（用本地浏览器开这个地址扫码登录）
+      - "3001:3001"   # OneBot 正向 WebSocket（bot 通过容器网络访问；映射到宿主机方便调试）
+    volumes:
+      - ./napcat_data/QQ:/app/.config/QQ          # QQ 登录态持久化（重启免再扫码，关键）
+      - ./napcat_data/config:/app/napcat/config   # NapCat 配置持久化
+    tty: true
+    stdin_open: true
+
+  bot:
+    build: .
+    container_name: alice-bot
+    restart: unless-stopped
+    depends_on:
+      - napcat
+    environment:
+      - NAPCAT_WS_URL=ws://napcat:3001
+      - NAPCAT_TOKEN=${NAPCAT_TOKEN:-}
+      - LLM_BASE_URL=${LLM_BASE_URL:-https://api.deepseek.com/v1}
+      - LLM_API_KEY=${LLM_API_KEY:-}
+      - LLM_MODEL=${LLM_MODEL:-deepseek-chat}
