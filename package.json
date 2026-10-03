@@ -1,0 +1,9 @@
+{
+  "name": "qq-alice-bot",
+  "version": "1.0.0",
+  "description": "蔚蓝档案爱丽丝人设的 QQ 聊天机器人（NapCat + OneBot v11）",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  }
+}
